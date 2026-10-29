@@ -26,5 +26,5 @@ Fixed the files panel UI not changing colors with light/dark theme. The issue wa
 
 ## Theme Behavior
 - Light theme: `--oc-bg: #f9fafb`, `--oc-text: #111827`, `--oc-panel: #ffffff`, `--oc-border: #e5e7eb`
-- Dark theme: `--oc-bg: #161b22`, `--oc-text: #ffffff`, `--oc-panel: #1c2330`, `--oc-border: #374151`
+- Dark theme: `--oc-bg: #161b22`, `--oc-text: #d1d5db`, `--oc-panel: #1c2330`, `--oc-border: #374151`
 - Panel now correctly follows the host's theme via `data-surface` attribute and updates on theme switches.
