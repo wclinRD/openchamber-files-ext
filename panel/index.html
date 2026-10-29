@@ -9,10 +9,45 @@
       body {
         margin: 0;
         height: 100%;
-        background: var(--oc-bg, #111);
-        color: var(--oc-text, #eee);
         font-family: var(--oc-font, system-ui, sans-serif);
       }
+      /* Fallback theme colors when host variables are not applied */
+      :root[data-surface="light"],
+      :root:not([data-surface]) {
+        --oc-bg: #f9fafb;
+        --oc-text: #111827;
+        --oc-panel: #ffffff;
+        --oc-border: #e5e7eb;
+        --oc-hover: rgba(0, 0, 0, 0.05);
+        --oc-muted: #4b5563;
+        --oc-primary: #2563eb;
+        --oc-error: #dc2626;
+      }
+      :root[data-surface="dark"] {
+        --oc-bg: #161b22;
+        --oc-text: #ffffff;
+        --oc-panel: #1c2330;
+        --oc-border: #374151;
+        --oc-hover: rgba(255, 255, 255, 0.08);
+        --oc-muted: #9ca3af;
+        --oc-primary: #60a5fa;
+        --oc-error: #f87171;
+      }
+      /* Fallback to system dark mode when host doesn't provide data-surface */
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-surface]),
+        :root:not([data-surface="light"]) {
+          --oc-bg: #161b22;
+          --oc-text: #ffffff;
+          --oc-panel: #1c2330;
+          --oc-border: #374151;
+          --oc-hover: rgba(255, 255, 255, 0.08);
+          --oc-muted: #9ca3af;
+          --oc-primary: #60a5fa;
+          --oc-error: #f87171;
+        }
+      }
+
       #root {
         height: 100%;
         min-height: 0;

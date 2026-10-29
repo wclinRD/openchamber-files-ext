@@ -275,7 +275,7 @@ const clear = (node: HTMLElement) => {
   node.replaceChildren();
 };
 
-const syntaxHighlight = HighlightStyle.define([
+const syntaxHighlightDark = HighlightStyle.define([
   { tag: t.keyword, color: "#c678dd" },
   { tag: [t.name, t.deleted, t.character, t.propertyName, t.macroName], color: "#e5e5e5" },
   { tag: [t.function(t.variableName), t.labelName], color: "#61afef" },
@@ -294,11 +294,30 @@ const syntaxHighlight = HighlightStyle.define([
   { tag: t.invalid, color: "#ff5555" },
 ]);
 
+const syntaxHighlightLight = HighlightStyle.define([
+  { tag: t.keyword, color: "#8959a8" },
+  { tag: [t.name, t.deleted, t.character, t.propertyName, t.macroName], color: "#374151" },
+  { tag: [t.function(t.variableName), t.labelName], color: "#4278ae" },
+  { tag: [t.color, t.constant(t.name), t.standard(t.name)], color: "#0d7364" },
+  { tag: [t.definition(t.name), t.separator], color: "#374151" },
+  { tag: [t.typeName, t.className, t.number, t.changed, t.annotation, t.modifier, t.self, t.namespace], color: "#c75b21" },
+  { tag: [t.operator, t.operatorKeyword, t.url, t.escape, t.regexp, t.link, t.special(t.string)], color: "#0d7364" },
+  { tag: [t.meta, t.comment], color: "#6b7280", fontStyle: "italic" },
+  { tag: t.strong, fontWeight: "bold" },
+  { tag: t.emphasis, fontStyle: "italic" },
+  { tag: t.strikethrough, textDecoration: "line-through" },
+  { tag: t.link, color: "#4278ae", textDecoration: "underline" },
+  { tag: t.heading, fontWeight: "bold", color: "#c7254e" },
+  { tag: [t.atom, t.bool, t.special(t.variableName)], color: "#c75b21" },
+  { tag: [t.processingInstruction, t.string, t.inserted], color: "#389e20" },
+  { tag: t.invalid, color: "#d1242f" },
+]);
+
 const editorTheme = EditorView.theme({
   "&": {
     height: "100%",
-    backgroundColor: "var(--oc-bg, #111)",
-    color: "var(--oc-text, #eee)",
+    backgroundColor: "var(--oc-bg)",
+    color: "var(--oc-text)",
     fontSize: "13px",
   },
   ".cm-scroller": {
@@ -307,30 +326,30 @@ const editorTheme = EditorView.theme({
     overflow: "auto",
   },
   ".cm-content": {
-    caretColor: "var(--oc-text, #eee)",
+    caretColor: "var(--oc-text)",
     padding: "8px 0",
   },
-  ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--oc-text, #eee)" },
+  ".cm-cursor, .cm-dropCursor": { borderLeftColor: "var(--oc-text)" },
   "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {
     backgroundColor: "rgba(97, 175, 239, 0.28)",
   },
-  ".cm-activeLine": { backgroundColor: "rgba(255,255,255,0.03)" },
+  ".cm-activeLine": { backgroundColor: "var(--oc-hover)" },
   ".cm-gutters": {
-    backgroundColor: "var(--oc-bg, #111)",
-    color: "var(--oc-muted, #666)",
+    backgroundColor: "var(--oc-bg)",
+    color: "var(--oc-muted)",
     border: "none",
-    borderRight: "1px solid var(--oc-border, #333)",
+    borderRight: "1px solid var(--oc-border)",
   },
   ".cm-activeLineGutter": {
-    backgroundColor: "rgba(255,255,255,0.05)",
-    color: "var(--oc-text, #eee)",
+    backgroundColor: "var(--oc-hover)",
+    color: "var(--oc-text)",
   },
-  ".cm-foldGutter span": { color: "var(--oc-muted, #666)" },
+  ".cm-foldGutter span": { color: "var(--oc-muted)" },
   ".cm-matchingBracket, &.cm-focused .cm-matchingBracket": {
     backgroundColor: "rgba(97, 175, 239, 0.2)",
     outline: "none",
   },
-  ".cm-selectionMatch": { backgroundColor: "rgba(255,255,255,0.1)" },
+  ".cm-selectionMatch": { backgroundColor: "var(--oc-hover)" },
 });
 
 const languageFor = (path: string): Extension => {
@@ -441,7 +460,7 @@ const ensureCm = (tab: Tab) => {
         history(),
         indentOnInput(),
         bracketMatching(),
-        syntaxHighlighting(syntaxHighlight),
+        syntaxHighlighting(document.documentElement.dataset.surface === "dark" ? syntaxHighlightDark : syntaxHighlightLight),
         EditorState.tabSize.of(2),
         indentUnit.of("  "),
         keymap.of([
@@ -572,9 +591,10 @@ const applySplit = () => {
   els.splitter.style.height = vertical ? "auto" : "6px";
   els.splitter.style.flex = "0 0 6px";
   els.splitter.style.cursor = vertical ? "col-resize" : "row-resize";
+  const border = isDark ? "#374151" : "#e5e7eb";
   els.editor.style.borderTop = vertical
     ? "none"
-    : "1px solid var(--oc-border, #333)";
+    : `1px solid ${border}`;
   splitBtn?.update({ label: splitLabel() });
   showEditor(Boolean(activeTab()));
 };
@@ -584,31 +604,31 @@ const styleUi = () => {
   const style = document.createElement("style");
   style.id = "oc-files-css";
   style.textContent = `
-.ft-row { display:flex; align-items:center; gap:6px; padding:4px 10px; cursor:pointer; user-select:none; font-size:13px; line-height:1.35; min-width:0; }
-.ft-row:hover { background: var(--oc-hover, rgba(255,255,255,0.06)); }
-.ft-row.is-active { background: var(--oc-hover, rgba(255,255,255,0.08)); border-radius:6px; }
-.ft-row.is-dir .ft-tw { color: var(--oc-muted, #888); opacity:1; font-size:10px; }
+.ft-row { display:flex; align-items:center; gap:6px; padding:4px 10px; cursor:pointer; user-select:none; font-size:13px; line-height:1.35; min-width:0; color:var(--oc-text); }
+.ft-row:hover { background:var(--oc-hover); }
+.ft-row.is-active { background:var(--oc-hover); border-radius:6px; }
+.ft-row.is-dir .ft-tw { color:var(--oc-muted); opacity:1; font-size:10px; }
 .ft-row.is-dir .ft-ic-dir { font-size:12px; opacity:0.9; min-width:1.5em; }
-.ft-label-dir { font-weight:600; color: var(--oc-text, #eee); }
+.ft-label-dir { font-weight:600; color:var(--oc-text); }
 .ft-tw { width:1em; flex:0 0 auto; opacity:0.7; font-size:11px; }
 .ft-ic { flex:0 0 auto; font-size:10px; opacity:0.65; min-width:1.4em; text-align:center; font-family:var(--oc-mono, monospace); }
 .ft-label { flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.ft-dot { width:7px; height:7px; border-radius:50%; background:var(--oc-primary, #6af); flex:0 0 auto; }
+.ft-dot { width:7px; height:7px; border-radius:50%; background:var(--oc-primary); flex:0 0 auto; }
 .oc-files-editor { display:flex; flex-direction:column; min-height:0; }
 .oc-files-editor .oc-tabstrip { display:flex; align-items:center; gap:2px; overflow-x:auto; flex:0 0 auto; padding:4px 0 0; min-height:28px; }
-.oc-files-editor .oc-chip { display:flex; align-items:center; gap:6px; max-width:180px; padding:3px 6px 3px 8px; border-radius:6px 6px 0 0; font-size:12px; cursor:pointer; font-family:var(--oc-mono, monospace); border:1px solid transparent; border-bottom:none; opacity:0.75; }
-.oc-files-editor .oc-chip.is-active { background:var(--oc-panel, #1a1a1a); border-color:var(--oc-border,#333); opacity:1; }
+.oc-files-editor .oc-chip { display:flex; align-items:center; gap:6px; max-width:180px; padding:3px 6px 3px 8px; border-radius:6px 6px 0 0; font-size:12px; cursor:pointer; font-family:var(--oc-mono, monospace); border:1px solid transparent; border-bottom:none; opacity:0.75; color:var(--oc-text); }
+.oc-files-editor .oc-chip.is-active { background:var(--oc-panel); border-color:var(--oc-border); opacity:1; }
 .oc-files-editor .oc-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding-top:6px; flex:0 0 auto; }
-.oc-cm-host { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; overflow:hidden; border-top:1px solid var(--oc-border, #333); }
+.oc-cm-host { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; overflow:hidden; border-top:1px solid var(--oc-border); }
 .oc-cm-host .cm-editor { flex:1 1 auto; min-height:0; height:100%; }
 .oc-cm-host .cm-editor.cm-focused { outline:none; }
 .oc-cm-host[hidden] { display:none; }
-.ocf-host { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; overflow:hidden; border-top:1px solid var(--oc-border, #333); }
+.ocf-host { flex:1 1 auto; min-height:0; display:flex; flex-direction:column; overflow:hidden; border-top:1px solid var(--oc-border); }
 .ocf-host[hidden] { display:none; }
 .ocf-host > .ocf-scroll { min-height:0; }
 .oc-crumbs { display:flex; align-items:center; gap:4px; flex:1 1 auto; flex-wrap:wrap; font-size:12px; min-width:0; }
-.oc-crumb { border:none; background:transparent; color:inherit; cursor:pointer; padding:2px 4px; border-radius:4px; font:inherit; opacity:0.85; }
-.oc-crumb:hover { background: var(--oc-hover, rgba(255,255,255,0.08)); }
+.oc-crumb { border:none; background:transparent; color:var(--oc-text); cursor:pointer; padding:2px 4px; border-radius:4px; font:inherit; opacity:0.85; }
+.oc-crumb:hover { background:var(--oc-hover); }
 `;
   document.head.appendChild(style);
 };
@@ -1333,6 +1353,8 @@ const updateToolbar = () => {
 const paintToolbar = () => updateToolbar();
 
 const styleEls = () => {
+  const isDark = document.documentElement.dataset.surface === "dark";
+  const border = isDark ? "#374151" : "#e5e7eb";
   const css = (el: HTMLElement, styles: Record<string, string>) => {
     Object.assign(el.style, styles);
   };
@@ -1341,13 +1363,13 @@ const styleEls = () => {
     alignItems: "center",
     gap: "6px",
     padding: "8px 10px",
-    borderBottom: "1px solid var(--oc-border, #333)",
+    borderBottom: `1px solid ${border}`,
     flexWrap: "wrap",
     minHeight: "40px",
   });
   css(els.search, {
     padding: "8px 10px",
-    borderBottom: "1px solid var(--oc-border, #333)",
+    borderBottom: `1px solid ${border}`,
   });
   css(els.body, {
     display: "flex",
@@ -1368,8 +1390,8 @@ const styleEls = () => {
     display: "none",
     height: "6px",
     flex: "0 0 6px",
-    cursor: "row-resize",
-    background: "var(--oc-border, #333)",
+    cursor: isDark ? "col-resize" : "row-resize",
+    background: border,
     touchAction: "none",
     userSelect: "none",
   });
@@ -1379,7 +1401,7 @@ const styleEls = () => {
     flex: "1 1 auto",
     height: "auto",
     minHeight: "200px",
-    borderTop: "1px solid var(--oc-border, #333)",
+    borderTop: `1px solid ${border}`,
     overflow: "hidden",
     minWidth: "0",
   });
@@ -1387,7 +1409,7 @@ const styleEls = () => {
     padding: "4px 10px",
     fontSize: "12px",
     opacity: "0.75",
-    borderTop: "1px solid var(--oc-border, #333)",
+    borderTop: `1px solid ${border}`,
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -1539,7 +1561,6 @@ const mountOnce = () => {
 
 host.onReady((ctx) => {
   applyHostReady(ctx, document.documentElement);
-  document.body.dataset.surface = ctx.surface;
   if (!didMount) {
     didMount = true;
     mountOnce();
